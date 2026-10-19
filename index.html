@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Dove sono?</title>
+  <meta name="theme-color" content="#1b2127">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231b2127'/%3E%3Cpath d='M6 32h12M26 32h12M46 32h12' stroke='%23f4c20d' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== Schermata di avvio ===== -->
+  <main id="start">
+    <div class="wrap">
+      <h1>Dove sono?</h1>
+      <p class="lead">Ti lascio in un punto qualunque del mondo, in Street View e senza mappa. Guardati intorno, cammina, leggi la bussola e metti il pin dove pensi di essere.</p>
+    </div>
+
+    <div class="roadline" aria-hidden="true"></div>
+
+    <div class="wrap">
+      <div id="keyBlock" class="field">
+        <label for="apiKey">Chiave API di Google Maps</label>
+        <input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="AIza…">
+        <small>Serve per caricare Street View. Resta salvata solo in questo browser. Le istruzioni per crearla sono nel README del progetto.</small>
+      </div>
+      <p id="startError" class="error" role="alert" hidden></p>
+      <div class="start-actions">
+        <button id="btnStart" class="sign" type="button">Portami da qualche parte</button>
+        <button id="btnChangeKey" class="link" type="button" hidden>Cambia chiave API</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== Gioco ===== -->
+  <section id="game" hidden>
+    <div id="pano"></div>
+
+    <svg id="compass" viewBox="0 -8 100 108" role="img" aria-label="Bussola">
+      <circle cx="50" cy="50" r="44" class="c-bg"/>
+      <g id="dial"></g>
+      <text id="heading" x="50" y="50" class="c-heading">0°</text>
+      <polygon points="50,7 44,-3 56,-3" class="c-mark"/>
+    </svg>
+
+    <button id="btnBack" class="ghost" type="button">Torna al punto di partenza</button>
+
+    <div id="reviewBar" hidden>
+      <button id="btnToResult" class="ghost" type="button">Torna ai risultati</button>
+    </div>
+
+    <div id="guessWrap" hidden>
+      <div id="guessPanel" role="dialog" aria-label="Mappa per mettere il pin">
+        <div id="guessMap"></div>
+        <div class="panel-bar">
+          <span id="guessHint">Tocca la mappa per mettere il pin</span>
+          <button id="btnConfirm" class="sign small" type="button" disabled>Conferma</button>
+        </div>
+      </div>
+      <button id="btnMap" class="sign blue" type="button">Apri mappa</button>
+    </div>
+
+    <div id="loading">
+      <div class="road" aria-hidden="true"></div>
+      <p id="loadingText">Carico Street View…</p>
+      <button id="loadingBtn" class="ghost" type="button" hidden></button>
+    </div>
+  </section>
+
+  <!-- ===== Risultato ===== -->
+  <section id="result" hidden>
+    <div id="resultMap"></div>
+
+    <aside id="resultPanel">
+      <header>
+        <div class="place">
+          <img id="flag" alt="" hidden>
+          <div>
+            <p id="placeName" class="place-name">Sto cercando il luogo…</p>
+            <p id="placeSub" class="place-sub"></p>
+          </div>
+        </div>
+        <p class="dist"><span id="distNum">0</span><small id="distUnit">km</small></p>
+        <p class="dist-label">dal luogo reale</p>
+        <div class="score">
+          <span id="scoreTxt">0 / 5.000</span>
+          <div class="bar"><i id="scoreBar"></i></div>
+        </div>
+      </header>
+
+      <div class="roadline thin" aria-hidden="true"></div>
+
+      <div id="chips" class="chips" hidden>
+        <span id="chipDrive" class="chip"></span>
+        <span id="chipTld" class="chip"></span>
+      </div>
+
+      <h2>Come riconoscerlo</h2>
+
+      <p id="noCountry" class="note" hidden>Per questo paese non ho ancora una scheda. Intanto ripassa la checklist qui sotto, e se vuoi aggiungilo in <code>data.js</code>.</p>
+
+      <div id="hints">
+        <article class="hint" id="h-v">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.5 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+          <div><h3>Vegetazione e paesaggio</h3><p></p></div>
+        </article>
+        <article class="hint" id="h-s">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3 4 21"/><path d="M16 3l4 18"/><path d="M12 4v3M12 10.5v3M12 17v3"/></svg>
+          <div><h3>Strade e segnaletica</h3><p></p></div>
+        </article>
+        <article class="hint" id="h-t">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10v4M6 12h3M13 10h5M13 14h5"/></svg>
+          <div><h3>Targhe e veicoli</h3><p></p></div>
+        </article>
+        <article class="hint" id="h-l">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M9 4v2M6 6c.5 3 2.5 5.5 6 7M12 6c-.5 3-3 6-8 8"/><path d="M13 20l4-9 4 9M14.5 17h5"/></svg>
+          <div><h3>Lingua e scritte</h3><p></p></div>
+        </article>
+        <article class="hint" id="h-a">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <div><h3>Altri indizi</h3><p></p></div>
+        </article>
+      </div>
+
+      <details id="checklist">
+        <summary>Checklist da ripassare a ogni luogo</summary>
+        <ol>
+          <li>Da che parte guidano? Guarda il lato in cui viaggiano le auto e dove sta il volante.</li>
+          <li>In che alfabeto sono le scritte? Latino, cirillico, greco, arabo, caratteri asiatici?</li>
+          <li>Sole e bussola: a mezzogiorno il sole sta a sud nell'emisfero nord e a nord in quello sud. Le ombre ti dicono dove sei.</li>
+          <li>Clima e vegetazione: quanto è verde, che alberi ci sono, che colore ha il terreno.</li>
+          <li>Strade: colore e tipo delle linee, paletti ai bordi, forma dei cartelli.</li>
+          <li>Pali della luce e del telefono, cavi, trasformatori.</li>
+          <li>Targhe, tipo di auto e mezzi pubblici.</li>
+          <li>Architettura, recinzioni, muri, tetti.</li>
+          <li>L'auto di Google: in alcuni paesi si vede ai bordi dell'immagine (antenne, snorkel, nastro adesivo) ed è un indizio.</li>
+        </ol>
+      </details>
+
+      <div class="actions">
+        <button id="btnReview" class="ghost big" type="button">Rivedi il posto</button>
+        <button id="btnNext" class="sign" type="button">Nuovo luogo</button>
+      </div>
+    </aside>
+  </section>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
