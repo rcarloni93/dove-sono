@@ -266,7 +266,7 @@ window.COUNTRIES = [
       v: "Foreste di betulle, pini e abeti, paesaggio piatto con campi e laghi.",
       s: "Strade secondarie sterrate, cartelli blu sulle strade principali.",
       t: "Bianca con banda blu UE e LV; formato AB-1234.",
-      l: "Lettone: ā, ē, ī, ū, ņ, ļ, ķ, ģ; «iela», «ceļs», «aptieka».",
+      l: "Lettone: ā, ē, ī, ū, ņ, ļ, ķ, ģ; «iela», «ceļš», «aptieka».",
       a: "Case in legno, fienili, edifici sovietici, cicogne." } },
 
   { cc: "lt", nome: "Lituania", guida: "dx", tld: ".lt",
@@ -275,7 +275,7 @@ window.COUNTRIES = [
       v: "Campi, betulle, pinete e laghi; paesaggio piatto con cicogne.",
       s: "Strade ben tenute; croci di legno scolpite ai crocicchi.",
       t: "Bianca con banda blu UE e LT; formato ABC 123.",
-      l: "Lituano: ą, č, ė, ų, ž; «gatvė», «kelias», «vaistingė».",
+      l: "Lituano: ą, č, ė, ų, ž; «gatvė», «kelias», «vaistinė».",
       a: "Croci di legno scolpite e cappelle ai bordi strada, nidi di cicogna, edifici sovietici." } },
 
   { cc: "ua", nome: "Ucraina", guida: "dx", tld: ".ua",
@@ -409,7 +409,7 @@ window.COUNTRIES = [
   { cc: "jp", nome: "Giappone", guida: "sx", tld: ".jp", w: 2,
     box: [[32.5, 129.5, 36.5, 140.5], [41.5, 139.5, 43.8, 144.0], [37.0, 138.0, 40.0, 141.0]],
     h: {
-      v: "Foreste dense di cedri (sugi) e bambÃ¹, risaie, montagne verdi e ripide; Hokkaido più simile al nord Europa.",
+      v: "Foreste dense di cedri (sugi) e bambù, risaie, montagne verdi e ripide; Hokkaido più simile al nord Europa.",
       s: "Si guida a sinistra. Specchi parabolici agli incroci, cavi elettrici fittissimi, cartelli blu sulle autostrade.",
       t: "Bianca (auto private) o gialla (kei car) con i kanji della prefettura; verde per alcuni veicoli commerciali.",
       l: "Giapponese: kanji, hiragana e katakana; cartelli stradali bianchi su verde o blu.",
